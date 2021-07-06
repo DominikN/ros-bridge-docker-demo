@@ -1,30 +1,28 @@
 version: "2.3"
 
 services:
-    ros-master:
-        image: ros:noetic-ros-core
-        command: stdbuf -o L roscore
-        tty: true        # docker run -t
-
-    ros1:
-        image: osrf/ros:noetic-desktop
-        environment:
-            - "ROS_MASTER_URI=http://ros-master:11311"
-        depends_on: 
-            - ros-master
-        command: rosrun rospy_tutorials talker
-        tty: true        # docker run -t
-
+    # ROS + ROS 2
     bridge:
         image: ros:foxy-ros1-bridge
         environment:
             - "ROS_MASTER_URI=http://ros-master:11311"
-        depends_on: 
-            - ros-master
-            - ros1
-            - ros2
         command: ros2 run ros1_bridge dynamic_bridge
 
+    # ROS
+    ros-master:
+        image: ros:noetic-ros-core
+        tty: true        # docker run -t
+        command: stdbuf -o L roscore
+        
+    # ROS
+    ros1:
+        image: osrf/ros:noetic-desktop
+        environment:
+            - "ROS_MASTER_URI=http://ros-master:11311"
+        tty: true        # docker run -t
+        command: rosrun rospy_tutorials talker
+        
+    # ROS 2
     ros2:
         image: osrf/ros:foxy-desktop
         command: ros2 run demo_nodes_cpp listener
